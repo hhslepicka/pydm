@@ -35,7 +35,7 @@ before_install:
 script:
   - whoami
   - ulimit -c unlimited
-  - python run_tests.py
+  - python run_tests.py --show-cov
 
 after_failure:
   - ls -lahtr /cores/

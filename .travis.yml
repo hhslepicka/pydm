@@ -38,6 +38,6 @@ script:
   - python run_tests.py --show-cov
 
 after_failure:
-  - ls -lahtr /cores/
-  - ls -lahtr ./
-  - python run_tests.py -k 'not test_base'
+  - COREFILE=$(find /cores/ -maxdepth 1 -name "core*" | head -n 1) # find core file
+  - if [[ -f "$COREFILE" ]]; then lldb -c "$COREFILE" -ex "thread apply all bt" -ex "set pagination 0" -batch; fi
+

@@ -12,13 +12,14 @@ class DataKeys(object):
     PRECISION = 'PRECISION'
     UPPER_LIMIT = 'UPPER_LIMIT'
     LOWER_LIMIT = 'LOWER_LIMIT'
+    TIMESTAMP = 'TIMESTAMP'
 
     @staticmethod
     def generate_introspection_for(connection_key=None, value_key=None,
                                    severity_key=None, write_access_key=None,
                                    enum_strings_key=None, unit_key=None,
                                    precision_key=None, upper_limit_key=None,
-                                   lower_limit_key=None
+                                   lower_limit_key=None, timestamp_key=None
                                    ):
         """
         Generates an introspection dictionary for a given set of keys.
@@ -46,6 +47,8 @@ class DataKeys(object):
             The key for the upper limit information at the data dictionary
         lower_limit_key : str
             The key for the lower limit information at the data dictionary
+        timestamp_key : str
+            The key for the timestamp information at the data dictionary
 
         Returns
         -------
@@ -61,7 +64,8 @@ class DataKeys(object):
             (unit_key, DataKeys.UNIT),
             (precision_key, DataKeys.PRECISION),
             (upper_limit_key, DataKeys.UPPER_LIMIT),
-            (lower_limit_key, DataKeys.LOWER_LIMIT)
+            (lower_limit_key, DataKeys.LOWER_LIMIT),
+            (timestamp_key, DataKeys.TIMESTAMP)
         ]
         introspection = dict()
 

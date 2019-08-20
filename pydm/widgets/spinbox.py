@@ -157,14 +157,17 @@ class PyDMSpinbox(QDoubleSpinBox, TextFormatter, PyDMWritableWidget):
 
     @Property(int)
     def precision(self):
-        return self._prec
+        if self.precisionFromPV:
+            return self._prec
+        else:
+            return self._user_prec
 
     @precision.setter
     def precision(self, new_prec):
         if self.precisionFromPV:
             return
-        if new_prec and self._prec != int(new_prec) and new_prec >= 0:
-            self._prec = int(new_prec)
+        if new_prec and self._user_prec != int(new_prec) and new_prec >= 0:
+            self._user_prec = int(new_prec)
             self.value_changed(self.value)
             self.setDecimals(new_prec)
 

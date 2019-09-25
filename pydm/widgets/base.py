@@ -1001,7 +1001,9 @@ class PyDMWritableWidget(PyDMWidget):
     send_value_signal = Signal([int], [float], [str], [bool], [np.ndarray])
 
     def __init__(self, init_channel=None):
+        self._auto_send_value = True
         self._write_access = False
+        self._dirty = False
         super(PyDMWritableWidget, self).__init__(init_channel=init_channel)
 
     def init_for_designer(self):
@@ -1040,6 +1042,18 @@ class PyDMWritableWidget(PyDMWidget):
                 QApplication.setOverrideCursor(QCursor(Qt.ForbiddenCursor))
 
         return PyDMWidget.eventFilter(self, obj, event)
+
+    @Property(bool)
+    def dirty(self):
+        return self._dirty
+
+    @Property(bool)
+    def autoSendValue(self):
+        return self._auto_send_value
+
+    @autoSendValue.setter
+    def autoSendValue(self, checked):
+        self._auto_send_value = checked
 
     def write_access_changed(self, new_write_access):
         """

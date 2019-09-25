@@ -6,9 +6,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 from qtpy.QtWidgets import QLineEdit, QMenu, QApplication
-from qtpy.QtCore import Property, Q_ENUMS
+from qtpy.QtCore import Property, Q_ENUMS, Slot
 from .. import utilities
-from .base import PyDMWritableWidget, TextFormatter
+from .base import PyDMWritableWidget, TextFormatter, refresh_style
 from .display_format import DisplayFormat, parse_value_for_display
 
 
@@ -36,6 +36,8 @@ class PyDMLineEdit(QLineEdit, TextFormatter, PyDMWritableWidget, DisplayFormat):
         self._display = None
         self._scale = 1
 
+        self.textEdited.connect(self.handle_edited)
+        # self.escapePressed.connect(self.abort_changes)
         self.returnPressed.connect(self.send_value)
         self.unitMenu = QMenu('Convert Units', self)
         self.create_unit_options()
@@ -55,6 +57,24 @@ class PyDMLineEdit(QLineEdit, TextFormatter, PyDMWritableWidget, DisplayFormat):
             # Trigger the update of display format
             self.value_changed(self.value)
 
+    @Property(bool)
+    def autoSendValue(self):
+        return super(PyDMLineEdit, self).autoSendValue
+
+    @autoSendValue.setter
+    def autoSendValue(self, checked):
+        self._auto_send_value = checked
+        if checked:
+            self.returnPressed.connect(self.send_value)
+        else:
+            self.returnPressed.disconnect(self.send_value)
+
+    def handle_edited(self, new_text):
+        if self._dirty:
+            return
+        self._dirty = True
+        refresh_style(self)
+
     def value_changed(self, new_val):
         """
         Receive and update the PyDMLineEdit for a new channel value
@@ -71,6 +91,12 @@ class PyDMLineEdit(QLineEdit, TextFormatter, PyDMWritableWidget, DisplayFormat):
         super(PyDMLineEdit, self).value_changed(new_val)
         self.set_display()
 
+    @Slot()
+    def abort_changes(self):
+        if self._display is not None:
+            self.setText(self._display)
+
+    @Slot()
     def send_value(self):
         """
         Emit a :attr:`send_value_signal` to update channel value.
@@ -79,6 +105,8 @@ class PyDMLineEdit(QLineEdit, TextFormatter, PyDMWritableWidget, DisplayFormat):
         before being sent back to the channel. This function is attached the
         ReturnPressed signal of the PyDMLineEdit
         """
+        self._dirty = False
+        refresh_style(self)
         send_value = str(self.text())
         # Clean text of unit string
         if self._show_units and self._unit and self._unit in send_value:
@@ -219,7 +247,7 @@ class PyDMLineEdit(QLineEdit, TextFormatter, PyDMWritableWidget, DisplayFormat):
         if self.value is None:
             return
 
-        if self.hasFocus():
+        if self.hasFocus() or self._dirty:
             return
 
         new_value = self.value
@@ -260,6 +288,6 @@ class PyDMLineEdit(QLineEdit, TextFormatter, PyDMWritableWidget, DisplayFormat):
         without pressing return.  Resets the value of the text field to the
         current channel value.
         """
-        if self._display is not None:
-            self.setText(self._display)
+        if not self._auto_send_value:
+            self.abort_changes()
         super(PyDMLineEdit, self).focusOutEvent(event)

@@ -37,7 +37,7 @@ extensions = [
     'sphinxcontrib.napoleon',
 ]
 
-autodoc_mock_imports = ["PyQt5"]
+autodoc_mock_imports = ["qtpy", "PyQt5"]
 
 module_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'../../')
 sys.path.insert(0,module_path)

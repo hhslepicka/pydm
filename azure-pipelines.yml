@@ -104,6 +104,7 @@ stages:
                 eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
                 eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
               )
+
       - job: 'Publish_Documentation'
         dependsOn: Control
         displayName: Publish - Documentation

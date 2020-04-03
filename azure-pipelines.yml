@@ -39,7 +39,7 @@ pr:
       - master
 
 variables:
-  OFFICIAL_REPO: 'hhslepicka/pydm'
+  OFFICIAL_REPO: 'slaclab/pydm'
 
 stages:
 #
@@ -67,7 +67,6 @@ stages:
                 eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
                 eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
               )
-
       - job: 'Publish_Documentation'
         dependsOn: Control
         displayName: Publish - Documentation
@@ -77,7 +76,7 @@ stages:
             and (
               eq( dependencies.Control.outputs['var.build_ok'], true),
               or (
-                contains(variables['Build.SourceBranch'],'heads/fix'),
+                contains(variables['Build.SourceBranch'],'heads/master'),
                 contains(variables['Build.SourceBranch'],'refs/tags')
               )
             )

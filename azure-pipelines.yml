@@ -122,7 +122,7 @@ stages:
           displayName: Artifact Download - Documentation
           condition: |
             and (
-              eq(dependencies.Control.outputs['var.build_ok'], true),
+              eq( $[ dependencies.Control.outputs['var.build_ok'] ], true),
               or (
                 contains(variables['Build.SourceBranch'],'heads/fix'),
                 contains(variables['Build.SourceBranch'],'refs/tags')

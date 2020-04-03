@@ -107,9 +107,9 @@ stages:
           clean: true
 
         - bash: |
-          echo "Hello from Deploy Docs..."
-          displayName: Sanity Check
-          
+            echo "Hello from Deploy Docs..."
+          displayName: "Sanity Check"
+
 #        - task: DownloadBuildArtifacts@0
 #          inputs:
 #            buildType: 'current'

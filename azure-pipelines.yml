@@ -90,14 +90,23 @@ stages:
               )
 
   - stage: "Deploy"
-    condition: |
-      and
-      (
-        eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
-        eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
-      )
     jobs:
+      - job: 'Control'
+        displayName: Build Control
+        pool:
+          vmImage: 'Ubuntu 16.04'
+        steps:
+          - bash: |
+            echo "##vso[task.setvariable variable=deploy_allowed;isOutput=true]true"
+          name: var
+          condition: |
+            and
+            (
+            eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+            eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+            )
       - job: 'Publish_Documentation'
+        dependsOn: Control
         displayName: Publish - Documentation
         pool:
           vmImage: 'Ubuntu 16.04'
@@ -112,11 +121,13 @@ stages:
             downloadPath: $(Build.Repository.LocalPath)/artifacts
           displayName: Artifact Download - Documentation
           condition: |
-            or (
-              contains(variables['Build.SourceBranch'],'heads/fix'),
-              contains(variables['Build.SourceBranch'],'refs/tags')
+            and (
+              eq(dependencies.Control.outputs['var.deploy_ok'], true),
+              or (
+                contains(variables['Build.SourceBranch'],'heads/fix'),
+                contains(variables['Build.SourceBranch'],'refs/tags')
+              )
             )
-
 #
 #        - bash: |
 #            git config --global user.name "Azure Pipelines"

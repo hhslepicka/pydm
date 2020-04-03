@@ -96,7 +96,7 @@ stages:
         pool:
           vmImage: 'Ubuntu 16.04'
         steps:
-          - bash: echo "##vso[task.setvariable variable=deploy;isOutput=true]true"
+          - bash: echo "##vso[task.setvariable variable=build_ok;isOutput=true]true"
             name: var
             condition: |
               and
@@ -122,7 +122,7 @@ stages:
           displayName: Artifact Download - Documentation
           condition: |
             and (
-              eq(dependencies.Control.outputs['var.deploy'], true),
+              eq(dependencies.Control.outputs['var.build_ok'], true),
               or (
                 contains(variables['Build.SourceBranch'],'heads/fix'),
                 contains(variables['Build.SourceBranch'],'refs/tags')

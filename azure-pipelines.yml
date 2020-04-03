@@ -80,42 +80,43 @@ stages:
                 eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
                 eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
               )
+
+          - bash: |
+              echo "Will this be skipped? "
+            condition: |
+              or (
+                contains(variables['Build.SourceBranch'],'heads/fix'),
+                contains(variables['Build.SourceBranch'],'refs/tags')
+              )
+
   - stage: "Deploy"
+    condition: |
+      and
+      (
+        eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+        eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+      )
     jobs:
       - job: 'Publish_Documentation'
         displayName: Publish - Documentation
-        condition: |
-          and
-          (
-            and
-            (
-              eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
-              eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
-            ),
-            or
-            (
-            contains(variables['Build.SourceBranch'],'heads/fix'),
-            contains(variables['Build.SourceBranch'],'refs/tags')
-            )
-          )
         pool:
           vmImage: 'Ubuntu 16.04'
-
         steps:
         - checkout: self
           persistCredentials: true
           clean: true
+        - task: DownloadBuildArtifacts@0
+          inputs:
+            buildType: 'current'
+            artifactName: 'docs_html'
+            downloadPath: $(Build.Repository.LocalPath)/artifacts
+          displayName: Artifact Download - Documentation
+          condition: |
+            or (
+              contains(variables['Build.SourceBranch'],'heads/fix'),
+              contains(variables['Build.SourceBranch'],'refs/tags')
+            )
 
-        - bash: |
-            echo "Hello from Deploy Docs..."
-          displayName: "Sanity Check"
-
-#        - task: DownloadBuildArtifacts@0
-#          inputs:
-#            buildType: 'current'
-#            artifactName: 'docs_html'
-#            downloadPath: $(Build.Repository.LocalPath)/artifacts
-#          displayName: Artifact Download - Documentation
 #
 #        - bash: |
 #            git config --global user.name "Azure Pipelines"

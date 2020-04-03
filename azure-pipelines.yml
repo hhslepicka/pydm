@@ -82,20 +82,22 @@ stages:
       - template: azure-pipelines-macos.yml
       - template: azure-pipelines-windows.yml
   - stage: "Deploy"
-    condition: |
-      and
-      (
-        eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
-        eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
-      )
     jobs:
       - job: 'Publish_Documentation'
         displayName: Publish - Documentation
         condition: |
-          or
+          and
           (
-          contains(variables['Build.SourceBranch'],'heads/master'),
-          contains(variables['Build.SourceBranch'],'refs/tags')
+            and
+            (
+              eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+              eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+            ),
+            or
+            (
+            contains(variables['Build.SourceBranch'],'heads/master'),
+            contains(variables['Build.SourceBranch'],'refs/tags')
+            )
           )
         pool:
           vmImage: 'Ubuntu 16.04'
@@ -125,7 +127,16 @@ stages:
       - job: 'Publish_PyPI'
         displayName: Publish - PyPI
         condition: |
-          contains(variables['Build.SourceBranch'],'refs/tags')
+          and
+          (
+            and
+            (
+              eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+              eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+            ),
+            contains(variables['Build.SourceBranch'],'refs/tags')
+          )
+
         pool:
           vmImage: 'Ubuntu 18.04'
 
@@ -169,10 +180,18 @@ stages:
       - job: 'Publish_Anaconda'
         displayName: Publish - Anaconda
         condition: |
-          or
+          and
           (
-          contains(variables['Build.SourceBranch'],'heads/master'),
-          contains(variables['Build.SourceBranch'],'refs/tags')
+            and
+            (
+              eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+              eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+            ),
+            or
+              (
+              contains(variables['Build.SourceBranch'],'heads/master'),
+              contains(variables['Build.SourceBranch'],'refs/tags')
+              )
           )
         pool:
           vmImage: 'Ubuntu 16.04'

@@ -42,6 +42,36 @@ variables:
   OFFICIAL_REPO: 'slaclab/pydm'
 
 stages:
+  - stage: "Debug"
+    - jobs:
+      - job: 'dbgVars'
+        displayName: Debug - Variables
+        pool:
+          vmImage: 'Ubuntu 16.04'
+        steps:
+          - bash: |
+              echo $(OFFICIAL_REPO)
+            displayName: Official Repo - $(OFFICIAL_REPO)
+          - bash: |
+              echo $(Build.Repository.Name)
+            displayName: Repo Name - $(Build.Repository.Name)
+          - bash: |
+              echo $(System.PullRequest.PullRequestNumber)
+            displayName: PR Number
+          - bash: |
+              echo $(Build.SourceBranch)
+            displayName: Source Branch - $(Build.SourceBranch)
+          - bash: |
+              echo "Skip if not official and not PR."
+            displayName: Skip Check
+            condition: |
+              and
+              (
+                eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+                eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+              )
+
+
   - stage: "Build"
     jobs:
       # Build the conda package and docs

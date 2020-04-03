@@ -75,7 +75,7 @@ stages:
           vmImage: 'Ubuntu 16.04'
         condition: |
             and (
-              eq( $[ dependencies.Control.outputs['var.build_ok'] ], true),
+              eq( dependencies.Control.outputs['var.build_ok'], true),
               or (
                 contains(variables['Build.SourceBranch'],'heads/fix'),
                 contains(variables['Build.SourceBranch'],'refs/tags')

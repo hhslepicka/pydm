@@ -43,7 +43,7 @@ variables:
 
 stages:
   - stage: "Debug"
-    - jobs:
+    jobs:
       - job: 'dbgVars'
         displayName: Debug - Variables
         pool:

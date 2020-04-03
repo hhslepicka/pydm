@@ -98,13 +98,13 @@ stages:
         steps:
           - bash: |
             echo "##vso[task.setvariable variable=deploy_allowed;isOutput=true]true"
-          name: var
-          condition: |
-            and
-            (
-            eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
-            eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
-            )
+            name: var
+            condition: |
+              and
+              (
+                eq(variables['Build.Repository.Name'], variables['OFFICIAL_REPO']),
+                eq(variables['System.PullRequest.PullRequestNumber'], variables['NULL'])
+              )
       - job: 'Publish_Documentation'
         dependsOn: Control
         displayName: Publish - Documentation
